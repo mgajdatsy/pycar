@@ -1,0 +1,4 @@
+type: PascalCase
+globul: ALL CAPS
+property, member: lowerCamelCase
+local var: snake_case
