@@ -60,8 +60,23 @@ class Line:
 
     def intersectWithLine(self, other):
         intersection = Vector(0,0)
-        if not self.isHorizontal():
-            pass
+        if not self.isParallelWith(other):
+            if self.b == other.b:
+                other.a*=2
+                other.b*=2
+                other.c*=2
+            if not self.isHorizontal():
+                intersection.y = ( ( self.a * other.c ) - ( other.a * self.c ) ) / (self.a * ( self.b + other.b ))
+                intersection.x = ( self.c - self.b * intersection.y ) / self.a
+                return intersection
+            else:
+                intersection.y = self.c / self.b
+                intersection.x = ( other.c - other.b * intersection.y ) / other.a
+                return intersection
+        else:
+            return None
+
+
             
 
 class Section:
@@ -144,3 +159,4 @@ class Map:
 
     def save(self, url):
         pass
+

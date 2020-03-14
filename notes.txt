@@ -18,3 +18,8 @@ lecsekkolni:
     nem párhuzamos-e
     a1 nem nulla, ha mégis akkor y megvan, x = ( c2 - b2y ) / a2
     b1 + b2 nem nulla, ha mégis: e2*=2
+
+devops
+automation
+webdev
+enterprise codemonkey
