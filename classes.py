@@ -162,7 +162,7 @@ class Map:
     
     def getColliderList(self):
         pass
-    
+
     nodes: list
     startPos: Vector
 
@@ -176,3 +176,11 @@ class Map:
     def save(self, url):
         pass
 
+def doesCollide(obj1, obj2):
+    for edge1 in obj1.getColliderList():
+        for edge2 in obj2.getColliderList():
+            if edge1.getIntersectWithSection(edge2) is None:
+                pass
+            else:
+                return True
+    return False
