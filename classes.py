@@ -61,7 +61,7 @@ class Line:
     def intersectWithLine(self, other):
         intersection = Vector(0,0)
         if not self.isParallelWith(other):
-            if self.b == other.b:
+            if abs(self.b) == abs(other.b):
                 other.a*=2
                 other.b*=2
                 other.c*=2
@@ -76,9 +76,6 @@ class Line:
         else:
             return None
 
-
-            
-
 class Section:
     def __init__(self, startPoint = Vector(),  endPoint = Vector()):
         self.start = startPoint
@@ -92,6 +89,18 @@ class Section:
         b = self.end.x-self.start.x
         c = -b*self.start.y - a*self.start.x
         return Line(a,b,c)
+
+    def containsPointInBox(self, point):
+        if ((point.x < self.startPoint.x) == (point.x > self.endPoint.x)) and ((point.y < self.startPoint.y) == (point.y > self.endPoint.y)):
+            return True
+        return False
+
+    def getIntersectWithSection(self, other):
+        inters = self.line().intersectWithLine(other.line())
+        if inters is not None:
+            if self.containsPointInBox(inters) and other.containsPointInBox(inters):
+                return inters
+        return None
 
 class Car:
     def __init__(self):
@@ -130,6 +139,7 @@ class Car:
             self.pos.x += self.posMax.x
         if self.pos.y < 0:
             self.pos.y += self.posMax.y
+        self.updateFacing()
            
     def updateFacing(self):
         self.img = pygame.transform.rotate(self.originalImg, self.facing)

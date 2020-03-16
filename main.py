@@ -36,7 +36,6 @@ def getControls(carStatus, gamemode):
 
 def updateCarView(car, track):
     car.move(CONTROLS, track)
-    car.updateFacing()
     gameDisplay.blit(car.img, (car.pos.x,car.pos.y))
 
 def drawMap(map):
