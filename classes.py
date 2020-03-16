@@ -111,6 +111,9 @@ class Car:
         self.facing = 0
         self.facingInRadians = (self.facing/180)*math.pi
         
+    def getColliderList(self):
+        pass
+
     steer: float
     speed: float
     pos: Vector
@@ -153,13 +156,16 @@ class Control:
     gas:    float
 
 class Map:
-    nodes: list
-    startPos: Vector
-
     def __init__(self, start, node_list):
         self.startPos=start
         self.nodes = node_list
     
+    def getColliderList(self):
+        pass
+    
+    nodes: list
+    startPos: Vector
+
     def open(self, url):
         mapfile = open(url)
         data = json.load(mapfile)
