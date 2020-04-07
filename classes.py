@@ -7,6 +7,9 @@ class Vector:
         self.x = x
         self.y = y
     
+    def __eq__(self, obj):
+        return isinstance(obj, Vector) and self.x == obj.x and self.y == obj.y
+
     x: float
     y: float
 
@@ -19,14 +22,36 @@ class Vector:
     def getNormal(self):
         return Vector( self.x / self.getLength(), self.y / self.getLength())
 
+
+    def plus(self, other):
+        return Vector(self.x + other.x, self.y + other.y)
+    
+    def minus(self, other):
+        other = other.multiplyByScalar(-1)
+        return self.add(other)
+
     def dotProduct(self, other):
         return math.sqrt(self.x*other.x + self.y*other.y)
+
+    def multiplyByScalar(self, other: int):
+        return Vector(self.x*other, self.y*other)
+
+    def multiplyByComplex(self, other):
+        x = self.x*other.x - self.y*other.y
+        y = self.x*other.y + self.y*other.x
+        return Vector(x,y)
+
 
     def getDistanceFromSection(self,segment):
         y = segment.end.y-segment.start.y
         x = segment.end.x-segment.start.x
         normal = Vector(y, -x)
         return math.sqrt( self.dotProduct(normal)-normal.getLength() )
+
+def getVectorFromRadians(angle):
+    x = math.cos(angle)
+    y = math.sin(angle)
+    return Vector(x,y)
 
 class Line:
     def __init__(self, a=0, b=0, c=0):
@@ -48,7 +73,7 @@ class Line:
             return True
         else: return False
 
-    def isParallelWith(self, other):
+    def isParallelCheck(self, other):
         if self.isHorizontal() != other.isHorizontal():
             return False
         elif self.isHorizontal() and other.isHorizontal():
@@ -108,32 +133,51 @@ class Car:
         self.speed = 0
         self.pos = Vector()
         self.posMax = Vector()
-        self.facing = 0
-        self.facingInRadians = (self.facing/180)*math.pi
+        self.facingInComplex = Vector(1,0)
+        self.width = 16
+        self.length = 32
         
-    def getColliderList(self):
-        pass
+    def IGetColliderList(self):
+        nodes = [] #0:lf, 1:lr, 2:rr, 3:rf
+        nodes.append(Vector(self.length/2, self.width/2))
+        nodes.append(Vector(-self.length/2, self.width/2))
+        nodes.append(Vector(-self.length/2, -self.width/2))
+        nodes.append(Vector(self.length/2, -self.width/2))
+        for node in nodes:
+            node = node.multiplyByComplex(self.facingInComplex)
+            node = node.add(self.pos)
+        edges = []
+        prevNode = nodes[len(nodes)-1]
+        for node in nodes:
+            edges.append(Section(prevNode, node))
+            prevNode = node
+        return edges
+        
 
     steer: float
     speed: float
+    length: float
+    width: float
     pos: Vector
     posMax: Vector
-    facing: float
-    facingInRadians: float
+
+    facingInComplex: Vector
+    def getFacing(self):
+        return self.facingInComplex.getAngle()
+
+    def getFacingInRadians(self):
+        return (self.getFacing()/180)*math.pi
+
     originalImg = pygame.image.load("assets/pickups/grey2.png")
     img=originalImg        
 
     def move(self, control, track):
         self.speed *= 0.97
         self.speed += control.gas
-        self.facing += control.steer*self.speed*0.9
-        if self.facing > 360:
-            self.facing -= 360
-        if self.facing < 0:
-            self.facing += 360
-        self.pos.x += math.cos(self.facingInRadians)*self.speed*1.2
-        self.pos.y -= math.sin(self.facingInRadians)*self.speed*1.2
-        self.facingInRadians = (self.facing/180)*math.pi
+        turn = getVectorFromRadians(control.steer*self.speed)
+        self.facingInComplex = self.facingInComplex.multiplyByComplex(turn)
+        self.pos.x += math.cos(self.getFacingInRadians())*self.speed*1.2
+        self.pos.y -= math.sin(self.getFacingInRadians())*self.speed*1.2
         if self.pos.x > self.posMax.x:
             self.pos.x -= self.posMax.x
         if self.pos.y > self.posMax.y:
@@ -143,9 +187,10 @@ class Car:
         if self.pos.y < 0:
             self.pos.y += self.posMax.y
         self.updateFacing()
+        return turn
            
     def updateFacing(self):
-        self.img = pygame.transform.rotate(self.originalImg, self.facing)
+        self.img = pygame.transform.rotate(self.originalImg, self.getFacing())
     
 class Control:
     def __init__(self):
@@ -160,8 +205,14 @@ class Map:
         self.startPos=start
         self.nodes = node_list
     
-    def getColliderList(self):
-        pass
+    def IGetColliderList(self):
+        edges = []
+        prevSection = self.nodes[len(self.nodes)-1]
+        for trackSection in self.nodes:
+            edges.append(Section(prevSection.startPoint, trackSection.startPoint))
+            edges.append(Section(prevSection.endPoint, trackSection.endPoint))
+            prevSection = trackSection
+        return edges
 
     nodes: list
     startPos: Vector

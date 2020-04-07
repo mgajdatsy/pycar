@@ -35,8 +35,22 @@ def getControls(carStatus, gamemode):
     return playerControl.getControls(CONTROLS)
 
 def updateCarView(car, track):
-    car.move(CONTROLS, track)
+    turnAmount = car.move(CONTROLS, track)
+    msg = ("({},{})")
+    print(msg.format(turnAmount.x,turnAmount.y))
+    message_display(msg.format(turnAmount.x,turnAmount.y))
     gameDisplay.blit(car.img, (car.pos.x,car.pos.y))
+
+def text_objects(text, font):
+    textSurface = font.render(text, True, black)
+    return textSurface, textSurface.get_rect()
+
+def message_display(text):
+    bigfont = pygame.font.Font('freesansbold.ttf',60)
+    TextSurf, TextRect = text_objects(text, bigfont)
+    TextRect.center = ((display_width*11/12),(display_height*11/12))
+    gameDisplay.blit(TextSurf, TextRect)
+
 
 def drawMap(map):
     track = map.nodes
