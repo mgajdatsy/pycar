@@ -9,6 +9,7 @@ class TestVector(unittest.TestCase):
         self.i = classes.Vector(0,1)
         self.unit = classes.Vector(1,0)
         self.v1 = classes.Vector(-1,-1)
+        self.v2 = classes.Vector(1,1)
     
     def test_getLength(self):
         self.assertEqual(self.null.getLength(),0)
@@ -26,6 +27,11 @@ class TestVector(unittest.TestCase):
         self.assertEqual(self.unit.getNormal(),self.unit)
         self.assertEqual(self.i.getNormal(),self.i)
         self.assertEqual(self.v1.getNormal(),classes.Vector(-1/math.sqrt(2),-1/math.sqrt(2)))
+
+    def test_add(self):
+        self.assertEqual(self.unit.__add__(self.i),self.v2)
+        self.assertEqual(self.v1.__add__(self.v2),self.null)
+        self.assertEqual(self.unit.__add__(self.null),self.unit)
         
     
 if __name__ == '__main__':

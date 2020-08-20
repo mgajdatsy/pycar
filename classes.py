@@ -1,6 +1,7 @@
 import pygame
 import math
 import json
+import numbers
 
 class Vector:
     def __init__(self, x = 0, y = 0 ):
@@ -23,23 +24,29 @@ class Vector:
         return Vector( self.x / self.getLength(), self.y / self.getLength())
 
 
-    def plus(self, other):
-        return Vector(self.x + other.x, self.y + other.y)
+    def __add__(self, obj):
+        if isinstance(obj, Vector):
+            return Vector(self.x + obj.x, self.y + obj.y)
+        else: pass
     
-    def minus(self, other):
-        other = other.multiplyByScalar(-1)
-        return self.add(other)
+    def __sub__(self, obj):
+        if isinstance(obj, Vector):
+            obj = obj.multiplyByScalar(-1)
+            return self + obj
+        else: pass
 
-    def dotProduct(self, other):
-        return math.sqrt(self.x*other.x + self.y*other.y)
+    def dotProduct(self, obj):
+        return math.sqrt(self.x*obj.x + self.y*obj.y)
 
-    def multiplyByScalar(self, other: int):
-        return Vector(self.x*other, self.y*other)
-
-    def multiplyByComplex(self, other):
-        x = self.x*other.x - self.y*other.y
-        y = self.x*other.y + self.y*other.x
-        return Vector(x,y)
+    def __mul__(self, obj):
+        if isinstance(obj, numbers.Number):
+            return Vector(self.x*obj, self.y*obj)
+        elif isinstance(obj, Vector):
+            x = self.x*obj.x - self.y*obj.y
+            y = self.x*obj.y + self.y*obj.x
+            return Vector(x,y)
+        else: pass
+    
 
 
     def getDistanceFromSection(self,segment):
@@ -175,7 +182,7 @@ class Car:
         self.speed *= 0.97
         self.speed += control.gas
         turn = getVectorFromRadians(control.steer*self.speed)
-        self.facingInComplex = self.facingInComplex.multiplyByComplex(turn)
+        self.facingInComplex = self.facingInComplex*turn
         self.pos.x += math.cos(self.getFacingInRadians())*self.speed*1.2
         self.pos.y -= math.sin(self.getFacingInRadians())*self.speed*1.2
         if self.pos.x > self.posMax.x:
@@ -187,7 +194,7 @@ class Car:
         if self.pos.y < 0:
             self.pos.y += self.posMax.y
         self.updateFacing()
-        return turn
+        return self.facingInComplex
            
     def updateFacing(self):
         self.img = pygame.transform.rotate(self.originalImg, self.getFacing())
