@@ -169,6 +169,7 @@ class Car:
     posMax: Vector
 
     facingInComplex: Vector
+    
     def getFacing(self):
         return self.facingInComplex.getAngle()
 
@@ -185,6 +186,11 @@ class Car:
         self.facingInComplex = self.facingInComplex*turn
         self.pos.x += math.cos(self.getFacingInRadians())*self.speed*1.2
         self.pos.y -= math.sin(self.getFacingInRadians())*self.speed*1.2
+        self.returnToBounds()
+        self.updateFacing()
+        return self.facingInComplex
+
+    def returnToBounds(self):
         if self.pos.x > self.posMax.x:
             self.pos.x -= self.posMax.x
         if self.pos.y > self.posMax.y:
@@ -193,9 +199,8 @@ class Car:
             self.pos.x += self.posMax.x
         if self.pos.y < 0:
             self.pos.y += self.posMax.y
-        self.updateFacing()
-        return self.facingInComplex
-           
+        
+
     def updateFacing(self):
         self.img = pygame.transform.rotate(self.originalImg, self.getFacing())
     
