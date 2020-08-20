@@ -184,8 +184,8 @@ class Car:
         self.speed += control.gas
         turn = getVectorFromRadians(control.steer*self.speed)
         self.facingInComplex = self.facingInComplex*turn
-        self.pos.x += math.cos(self.getFacingInRadians())*self.speed*1.2
-        self.pos.y -= math.sin(self.getFacingInRadians())*self.speed*1.2
+        self.pos.x += self.facingInComplex.x*self.speed*1.2
+        self.pos.y -= self.facingInComplex.y*self.speed*1.2
         self.returnToBounds()
         self.updateFacing()
         return self.facingInComplex
