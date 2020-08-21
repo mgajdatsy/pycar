@@ -136,13 +136,14 @@ class Section:
 
 class Car:
     def __init__(self):
+        self.posMax = Vector()
+        self.width = 16
+        self.length = 32
+        
         self.steer = 0
         self.speed = 0
         self.pos = Vector()
-        self.posMax = Vector()
         self.facingInComplex = Vector(1,0)
-        self.width = 16
-        self.length = 32
         
     def IGetColliderList(self):
         nodes = [] #0:lf, 1:lr, 2:rr, 3:rf
@@ -160,15 +161,17 @@ class Car:
             prevNode = node
         return edges
         
-
-    steer: float
-    speed: float
     length: float
     width: float
-    pos: Vector
     posMax: Vector
-
+    originalImg = pygame.image.load("assets/pickups/grey2.png")
+    
+    steer: float
+    speed: float
+    pos: Vector
     facingInComplex: Vector
+    img=originalImg        
+
     
     def getFacing(self):
         return self.facingInComplex.getAngle()
@@ -176,9 +179,7 @@ class Car:
     def getFacingInRadians(self):
         return (self.getFacing()/180)*math.pi
 
-    originalImg = pygame.image.load("assets/pickups/grey2.png")
-    img=originalImg        
-
+    
     def move(self, control, track):
         self.speed *= 0.97
         self.speed += control.gas
